@@ -1,9 +1,9 @@
-from . import Target, enviorment
+from . import Target, environment
 
 
 def parse_args(args: vars):
-    enviorment.TARGET = args["target"]
-    enviorment.GUI = args["gui"]
+    environment.TARGET = args["target"]
+    environment.GUI = args["gui"]
 
 def target(arg: str):
     arg = arg.lower()

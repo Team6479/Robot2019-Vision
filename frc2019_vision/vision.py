@@ -3,7 +3,7 @@ import math
 import cv2
 import imutils
 
-from . import Target, enviorment
+from . import Target, environment
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -19,10 +19,10 @@ def create_windows():
     cv2.resizeWindow("DBG", SCREEN_WIDTH, SCREEN_HEIGHT)
 
 def contour(frame):
-    if enviorment.TARGET == Target.TAPE:
+    if environment.TARGET == Target.TAPE:
         hsv_lower = (74, 28, 248)
         hsv_upper = (99, 74, 255)
-    elif enviorment.TARGET == Target.BALL:
+    elif environment.TARGET == Target.BALL:
         hsv_lower = (0, 150, 148)
         hsv_upper = (15, 255, 255)
     else:
