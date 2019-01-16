@@ -1,16 +1,16 @@
 import cv2
 
-from . import Target, enviorment, gui, vision
+from . import Target, environment, gui, vision
 
 
 def set_camera(port: int):
-    enviorment.VIDEO_STREAM = port
+    environment.VIDEO_STREAM = port
 
 def start_loop():
     # keep looping
     while True:
         # grab the current frame
-        frame = enviorment.VIDEO_STREAM.read()
+        frame = environment.VIDEO_STREAM.read()
 
         # if we are viewing a video and we did not grab a frame,
         # then we have reached the end of the video
@@ -19,12 +19,12 @@ def start_loop():
 
         frame, cnts = vision.contour(frame)
 
-        if enviorment.TARGET == Target.TAPE:
+        if environment.TARGET == Target.TAPE:
             frame = vision.detect_tape(frame, cnts)
-        elif enviorment.TARGET == Target.BALL:
+        elif environment.TARGET == Target.BALL:
             frame = vision.detect_ball(frame, cnts)
 
-        if enviorment.GUI:
+        if environment.GUI:
             gui.draw_crosshairs(frame)
 
             # show the frame to our screen

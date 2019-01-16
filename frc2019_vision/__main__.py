@@ -11,13 +11,13 @@ def main():
     ap.add_argument("-g", "--gui", action='store_true', help="tell application to display a window")
     args.parse_args(vars(ap.parse_args()))
 
-    if enviorment.GUI:
+    if environment.GUI:
         vision.create_windows()
 
     core.start_loop()
 
     # if we are not using a video file, stop the camera video stream
-    enviorment.VIDEO_STREAM.stop()
+    environment.VIDEO_STREAM.stop()
 
     # close all windows
     cv2.destroyAllWindows()
