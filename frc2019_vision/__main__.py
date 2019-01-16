@@ -2,7 +2,7 @@ import argparse
 
 import cv2
 
-from . import args, core, enviorment, vision
+from . import args, core, environment, vision
 
 
 def main():
