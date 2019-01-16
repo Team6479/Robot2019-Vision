@@ -1,0 +1,13 @@
+include LICENSE README.md
+recursive-include frc2019_vision LICENSE LICENSE* *LICENSE* *COPYING* cacert.pem
+recursive-include frc2019_vision *.md *.APACHE *.BSD
+recursive-include frc2019_vision Makefile
+recursive-include frc2019_vision/vendor vendor.txt
+recursive-include frc2019_vision README
+include frc2019_vision/patched/patched.txt
+include frc2019_vision/vendor/*.txt
+include frc2019_vision/vendor/Makefile
+exclude .editorconfig .travis.yml appveyor.yml tox.ini pytest.ini
+exclude Pipfile*
+
+prune tasks

@@ -4,8 +4,14 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+frc2019-vision = {editable = true,path = "."}
+#black = "*"
+invoke = "*"
+ipython = "*"
+isort = "*"
+mypy = "*"
 pylint = "*"
-black = "*"
+requests = "*"
 
 [packages]
 imutils = "*"

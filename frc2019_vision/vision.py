@@ -1,12 +1,9 @@
-import argparse
 import math
-import time
-from collections import deque
 
 import cv2
 import imutils
-import numpy as np
-from imutils.video import VideoStream
+
+from . import Target, enviorment
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -14,39 +11,24 @@ BALL_RADIUS = 6.5
 CAMERA_ANGLE = 60
 ARCTAN_30 = 1.537
 
-ap = argparse.ArgumentParser()
-ap.add_argument("-t", "--target", type=str, default="ball", help="object to detect")
-args = vars(ap.parse_args())
+def create_windows():
+    cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("Frame", SCREEN_WIDTH, SCREEN_HEIGHT)
 
-
-# define the lower and upper boundaries of the "green"
-# ball in the HSV color space, then initialize the
-# list of tracked points
-# colorLower = (5, 50, 50)
-
-if args["target"] == "tape":
-    HSV_LOWER = (74, 28, 248)
-    HSV_UPPER = (99, 74, 255)
-elif args["target"] == "ball":
-    HSV_LOWER = (0, 150, 148)
-    HSV_UPPER = (15, 255, 255)
-
-# if a video path was not supplied, grab the reference
-# to the webcam
-# VIDEO_STREAM = VideoStream(src=2).start()
-VIDEO_STREAM = VideoStream(src=2).start()
-VIDEO_STREAM.stream.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0.25)
-# VIDEO_STREAM.set(cv2.CAP_PROP_EXPOSURE, -10)
-
-# allow the camera or video file to warm up
-
-cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("Frame", SCREEN_WIDTH, SCREEN_HEIGHT)
-
-cv2.namedWindow("DBG", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("DBG", SCREEN_WIDTH, SCREEN_HEIGHT)
+    cv2.namedWindow("DBG", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("DBG", SCREEN_WIDTH, SCREEN_HEIGHT)
 
 def contour(frame):
+    if enviorment.TARGET == Target.TAPE:
+        hsv_lower = (74, 28, 248)
+        hsv_upper = (99, 74, 255)
+    elif enviorment.TARGET == Target.BALL:
+        hsv_lower = (0, 150, 148)
+        hsv_upper = (15, 255, 255)
+    else:
+        hsv_lower = (0, 0, 0)
+        hsv_upper = (0, 0, 0)
+
     # resize the frame, blur it, and convert it to the HSV
     # color space
     frame = imutils.resize(frame, width=800)
@@ -56,7 +38,7 @@ def contour(frame):
     # construct a mask for the color "green", then perform
     # a series of dilations and erosions to remove any small
     # blobs left in the mask
-    mask = cv2.inRange(hsv, HSV_LOWER, HSV_UPPER)
+    mask = cv2.inRange(hsv, hsv_lower, hsv_upper)
     mask = cv2.erode(mask, None, iterations=2)
     mask = cv2.dilate(mask, None, iterations=2)
     cv2.imshow("DBG", mask)
@@ -71,7 +53,7 @@ def detect_ball(frame, cnts):
     center = None
 
     # only proceed if at least one contour was found
-    if len(cnts) > 0:
+    if cnts:
         # find the largest contour in the mask, then use
         # it to compute the minimum enclosing circle and
         # centroid
@@ -136,7 +118,7 @@ def detect_tape(frame, cnts):
     center = None
 
     # only proceed if at least one contour was found
-    if len(cnts) > 0:
+    if cnts:
         # find the largest contour in the mask, then use
         # it to compute the minimum enclosing circle and
         # centroid
@@ -159,44 +141,3 @@ def detect_tape(frame, cnts):
             cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (255, 0, 0), 2)
             cv2.circle(frame, center, 5, (0, 0, 255), -1)
     return frame
-
-
-# keep looping
-while True:
-    # grab the current frame
-    frame = VIDEO_STREAM.read()
-
-    # if we are viewing a video and we did not grab a frame,
-    # then we have reached the end of the video
-    if frame is None:
-        break
-
-    frame, cnts = contour(frame)
-
-    if args["target"] == "tape":
-        frame = detect_tape(frame, cnts)
-    elif args["target"] == "ball":
-        frame = detect_ball(frame, cnts)
-
-    # Draw main vertical line
-    cv2.line(frame, (400, 0), (400, 600), (0, 0, 255), 2)
-    # Draw main horizontal line
-    cv2.line(frame, (0, 300), (800, 300), (0, 0, 255), 2)
-
-    # Draw two guide lines
-    cv2.line(frame, (350, 100), (350, 500), (0, 0, 255), 2)
-    cv2.line(frame, (450, 100), (450, 500), (0, 0, 255), 2)
-
-    # show the frame to our screen
-    cv2.imshow("Frame", frame)
-    key = cv2.waitKey(1) & 0xFF
-
-    # if the 'q' key is pressed, stop the loop
-    if key == ord("q"):
-        break
-
-# if we are not using a video file, stop the camera video stream
-VIDEO_STREAM.stop()
-
-# close all windows
-cv2.destroyAllWindows()
