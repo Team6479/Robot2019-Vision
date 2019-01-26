@@ -3,6 +3,7 @@ import os
 
 from setuptools import find_packages, setup
 
+
 # Taken from pipenv
 # See https://github.com/pypa/pipenv/blob/master/setup.py
 here = os.path.abspath(os.path.dirname(__file__))
@@ -23,6 +24,9 @@ setup(
     url='https://github.com/Team6479/Robot2019-Vision',
     author='Team6479',
     packages=find_packages(exclude=["tasks", "tasks.*"]),
+    install_requires=[
+        "netifaces",
+    ],
     entry_points={
         'console_scripts': [
             'vision-2019 = frc2019_vision.__main__:main',

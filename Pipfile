@@ -3,20 +3,24 @@ name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
 
-[dev-packages]
-frc2019-vision = {editable = true,path = "."}
-#black = "*"
-invoke = "*"
-ipython = "*"
-isort = "*"
-mypy = "*"
-pylint = "*"
-requests = "*"
-
 [packages]
 imutils = "*"
 numpy = "*"
 opencv-python = "*"
+netifaces = "*"
+
+[dev-packages]
+frc2019_vision = {editable = true,path = "."}
+black = "*"
+flake8 = "*"
+flake8-mypy = "*"
+invoke = "*"
+ipython = "*"
+isort = "*"
+requests = "*"
 
 [requires]
 python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true

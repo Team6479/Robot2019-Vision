@@ -6,11 +6,13 @@ import os
 import shutil
 import tarfile
 import zipfile
+
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 import invoke
 import requests
+
 
 TASK_NAME = 'update'
 

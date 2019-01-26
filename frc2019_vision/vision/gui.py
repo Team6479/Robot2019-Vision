@@ -1,5 +1,12 @@
 import cv2
 
+from .. import environment
+
+
+def imshow(name: str, frame):
+    if environment.GUI:
+        cv2.imshow(name, frame)
+
 
 def draw_crosshairs(frame):
     # Draw main vertical line
