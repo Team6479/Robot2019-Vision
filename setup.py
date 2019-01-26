@@ -26,6 +26,9 @@ setup(
     packages=find_packages(exclude=["tasks", "tasks.*"]),
     install_requires=[
         "netifaces",
+        "opencv-python",
+        "imutils",
+        "numpy"
     ],
     entry_points={
         'console_scripts': [
