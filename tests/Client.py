@@ -3,7 +3,8 @@
 import socket
 import sys
 
-HOST, PORT = "localhost", 5005
+
+HOST, PORT = "192.168.1.7", 5005
 
 # Create a socket (SOCK_STREAM means a TCP socket)
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:

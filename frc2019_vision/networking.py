@@ -1,5 +1,4 @@
 import socketserver
-
 from enum import Enum
 
 import netifaces
@@ -38,10 +37,12 @@ class RioConnectionHandler(socketserver.BaseRequestHandler):
 class RioConnectionFactoryThread(StoppableThread):
     def __init__(self):
         StoppableThread.__init__(self)
-        self._ip = netifaces.ifaddresses("lo")[netifaces.AF_INET][0]["peer"]
-        # self._ip = netifaces.ifaddresses("eth0")[netifaces.AF_INET][0]["peer"]
+        # self._ip = netifaces.ifaddresses("lo")[netifaces.AF_INET][0]["addr"]
+        self._ip = netifaces.ifaddresses("eth0")[netifaces.AF_INET][0]["addr"]
         self._port = 5005
-        self._server = socketserver.TCPServer((self._ip, self._port), RioConnectionHandler)
+        self._server = socketserver.TCPServer(
+            (self._ip, self._port), RioConnectionHandler
+        )
 
     def run(self):
         try:

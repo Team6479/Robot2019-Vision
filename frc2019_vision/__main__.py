@@ -8,7 +8,9 @@ from .events import handler
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("target", type=args.target, help="object to detect")
-    ap.add_argument("-g", "--gui", action="store_true", help="tell application to display a window")
+    ap.add_argument(
+        "-g", "--gui", action="store_true", help="tell application to display a window"
+    )
     args.parse_args(vars(ap.parse_args()))
 
     handler.index()
