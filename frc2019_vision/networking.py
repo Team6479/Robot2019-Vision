@@ -1,14 +1,14 @@
+import pickle
 import socketserver
+
 from enum import Enum
+
+import cv2
 
 import netifaces
 
-from . import StoppableThread
+from . import StoppableThread, environment
 from .events import handler as event_handler
-
-import pickle
-
-import cv2
 
 
 class ConnectionType(Enum):
@@ -66,9 +66,9 @@ class DriverstationConnectionHandler(socketserver.BaseRequestHandler):
         while True:
             # print("CONNECTED: " + str(initial.decode('utf-8')))
             # somehow get feed
-            feed = "placeholder"
+            feed = environment.DRIVERSTATION_FRAMES.get()
             encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 40]
-            result, encimg = cv2.imencode('.jpg', feed, encode_param)
+            result, encimg = cv2.imencode(".jpg", feed, encode_param)
             packet = pickle.dumps([encimg, packets])
             socket.sendto(packet, self.client_address)
             packets = packets + 1
@@ -78,8 +78,9 @@ class DriverstationConnectionFactoryThread(StoppableThread):
     def __init__(self):
         self._HOST,
         self._PORT = netifaces.ifadresses("eth0")[netifaces.AF_INET][0]["addr"], 9999
-        self._server = socketserver.UDPServer((self._HOST, self._PORT),
-                                              DriverstationConnectionHandler())
+        self._server = socketserver.UDPServer(
+            (self._HOST, self._PORT), DriverstationConnectionHandler()
+        )
 
     def run(self):
         try:
