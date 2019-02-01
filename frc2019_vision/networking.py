@@ -1,6 +1,5 @@
 import pickle
 import socketserver
-
 from enum import Enum
 
 import cv2
@@ -76,6 +75,7 @@ class DriverstationConnectionHandler(socketserver.BaseRequestHandler):
 
 class DriverstationConnectionFactoryThread(StoppableThread):
     def __init__(self):
+        StoppableThread.__init__(self)
         self._HOST = netifaces.ifaddresses("eth0")[netifaces.AF_INET][0]["addr"]
         self._PORT = 9999
         self._server = socketserver.UDPServer(
