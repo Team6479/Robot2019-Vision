@@ -75,7 +75,7 @@ class DriverstationConnectionHandler(socketserver.BaseRequestHandler):
 
 class DriverstationConnectionFactoryThread(StoppableThread):
     def __init__(self):
-        self._HOST = netifaces.ifadresses("eth0")[netifaces.AF_INET][0]["addr"]
+        self._HOST = netifaces.ifaddresses("eth0")[netifaces.AF_INET][0]["addr"]
         self._PORT = 9999
         self._server = socketserver.UDPServer(
             (self._HOST, self._PORT), DriverstationConnectionHandler()
