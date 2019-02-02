@@ -3,7 +3,6 @@ import os
 
 from setuptools import find_packages, setup
 
-
 # Taken from pipenv
 # See https://github.com/pypa/pipenv/blob/master/setup.py
 here = os.path.abspath(os.path.dirname(__file__))
@@ -26,7 +25,6 @@ setup(
     packages=find_packages(exclude=["tasks", "tasks.*"]),
     install_requires=[
         "netifaces",
-        "opencv-python",
         "imutils",
         "numpy"
     ],
