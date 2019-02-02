@@ -2,13 +2,12 @@ from imutils.video import VideoStream
 
 from . import OverwritingLifoQueue, Target
 
-
 TARGET: OverwritingLifoQueue = OverwritingLifoQueue(2)
 # Set default value of Target
 TARGET.put(Target.NONE)
 
 GUI: bool = False
-CAMERA_PORT: int = 2
+CAMERA_PORT: int = 0
 VIDEO_STREAM: VideoStream = VideoStream(src=CAMERA_PORT).start()
 
 # Vision Information
