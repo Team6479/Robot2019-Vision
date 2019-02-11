@@ -1,7 +1,5 @@
 import pickle
-import socket
 import socketserver
-import time
 
 from enum import Enum
 
@@ -98,45 +96,3 @@ class DriverstationConnectionFactoryThread(StoppableThread):
 
     def stop(self):
         self._server.shutdown()
-
-
-class DriverstationBroadcastThread(StoppableThread):
-    def __init__(self):
-        StoppableThread.__init__(self)
-        # fmt: off
-        self._broadcast = netifaces.ifaddresses(environment.NETIFACE)[netifaces.AF_INET][0]["broadcast"] # noqa
-        # fmt: on
-        self._send_port = 9999
-        self._recv_port = 9998
-        self._server = socket.socket(
-            socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP
-        )
-
-    def run(self):
-        self._server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self._server.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        # Set a timeout so the socket does not block
-        # indefinitely when trying to receive data.
-        self._server.settimeout(0)
-        self._server.bind(("", self._recv_port))
-
-        packets = 0
-        PACKET_TIME_MS = 33
-        prev_time = 0
-        while not self.stopped():
-            if self.stopped():
-                continue
-
-            current_time = int(time.time() * 1000)
-            time_diff = abs(prev_time - current_time)
-            if time_diff < PACKET_TIME_MS:
-                # print("Sleeping for: " + str(time_diff / 1000))
-                self._stop_event.wait(time_diff / 1000)
-            prev_time = current_time
-
-            feed = environment.DRIVERSTATION_FRAMES.get()
-            encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 40]
-            result, encimg = cv2.imencode(".jpg", feed, encode_param)
-            packet = pickle.dumps([encimg, packets])
-            self._server.sendto(packet, (self._broadcast, self._send_port))
-            packets = packets + 1

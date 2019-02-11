@@ -1,5 +1,4 @@
-from .networking import (DriverstationBroadcastThread,
-                         DriverstationConnectionFactoryThread,
+from .networking import (DriverstationConnectionFactoryThread,
                          RioConnectionFactoryThread)
 from .vision.vision import VisionThread
 
@@ -16,7 +15,6 @@ def create():
     VISION_THREAD = VisionThread()
     RIO_THREAD = RioConnectionFactoryThread()
     DRIVERSTATION_THREAD = DriverstationConnectionFactoryThread()
-    # DRIVERSTATION_THREAD = DriverstationConnectionFactoryThread()
 
 
 def start():
