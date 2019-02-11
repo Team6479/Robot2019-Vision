@@ -2,6 +2,7 @@ import pickle
 import socket
 import socketserver
 import time
+
 from enum import Enum
 
 import cv2
@@ -60,47 +61,13 @@ class RioConnectionFactoryThread(StoppableThread):
         self._server.shutdown()
 
 
-class KeepAliveThread(StoppableThread):
-    def __init__(self, request: socket.socket, stop_func):
-        StoppableThread.__init__(self)
-        self._request: socket.socket = request
-        self._stop_func = stop_func
-
-    def run(self):
-        self._request.settimeout(1)
-
-        while not self.stopped():
-            if self.stopped():
-                continue
-
-            try:
-                self._request.recv(1024)
-            except socket.timeout:
-                self._stop_func()
-                self.stop()
-
-
 class DriverstationConnectionHandler(socketserver.BaseRequestHandler):
-    def __init__(self, request, client_address, server):
-        self.request = request
-        self.client_address = client_address
-        self.server = server
-        self._stopped = False
-        self.setup()
-        try:
-            self.handle()
-        finally:
-            self.finish()
-
     def handle(self):
         # initial = self.request[0].strip()
         socket: socket.socket = self.request[1]
 
-        keep_alive = KeepAliveThread(socket, self.stop)
-        # keep_alive.start()
-
         packets = 0
-        while not self._stopped:
+        while True:
             # print("CONNECTED: " + str(initial.decode('utf-8')))
             # somehow get feed
             feed = environment.DRIVERSTATION_FRAMES.get()
@@ -108,11 +75,8 @@ class DriverstationConnectionHandler(socketserver.BaseRequestHandler):
             result, encimg = cv2.imencode(".jpg", feed, encode_param)
             packet = pickle.dumps([encimg, packets])
             # socket.sendto(packet, self.client_address)
-            socket.sendto(packet, (self.client_address[0], 9999))
+            socket.sendto(packet, self.client_address)
             packets = packets + 1
-
-    def stop(self):
-        self._stopped = True
 
 
 class DriverstationConnectionFactoryThread(StoppableThread):
@@ -121,7 +85,7 @@ class DriverstationConnectionFactoryThread(StoppableThread):
         # fmt: off
         self._HOST = netifaces.ifaddresses(environment.NETIFACE)[netifaces.AF_INET][0]["addr"] # noqa
         # fmt: on
-        self._PORT = 9998
+        self._PORT = 9999
         self._server = socketserver.ThreadingUDPServer(
             (self._HOST, self._PORT), DriverstationConnectionHandler
         )
