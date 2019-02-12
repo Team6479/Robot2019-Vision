@@ -180,6 +180,11 @@ class VisionThread(StoppableThread):
                 # grab the current frame
                 frame = environment.VIDEO_STREAM.read()
 
+                # Put current frame (with crosshairs) in queue for Driverstation stream
+                frame_copy = frame
+                gui.draw_crosshairs(frame_copy)
+                environment.DRIVERSTATION_FRAMES.put(frame_copy)
+
                 # if we are viewing a video and we did not grab a frame,
                 # then we have reached the end of the video
                 if frame is None:
