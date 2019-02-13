@@ -1,7 +1,4 @@
-import math
-
 import cv2
-import imutils
 
 from . import gui
 from .. import StoppableThread, Target, environment
@@ -44,12 +41,12 @@ class VisionThread(StoppableThread):
                 target: Target = environment.TARGET.get()
 
                 if target == Target.TAPE:
-                    tape_pipeline = pipeline.TapePipeline(False, calib_fname=constants.CALIBRATION_FILE_LOCATION)
+                    tape_pipeline = pipeline.TapePipeline(calib_fname=constants.CALIBRATION_FILE_LOCATION)
                     frame, dist, angle = tape_pipeline.process_image(frame)
                     update_enviornment(dist, angle)
 
                 elif target == Target.BALL:
-                    ball_pipeline = pipeline.BallPipeline(False, calib_fname=constants.CALIBRATION_FILE_LOCATION)
+                    ball_pipeline = pipeline.BallPipeline()
                     frame, dist, angle = ball_pipeline.ball_val(frame)
                     update_enviornment(dist, angle)
 
