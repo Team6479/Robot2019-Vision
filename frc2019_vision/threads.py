@@ -1,6 +1,9 @@
-from .networking import (DriverstationConnectionFactoryThread,
-                         RioConnectionFactoryThread)
+from .networking import (
+    DriverstationConnectionFactoryThread,
+    RioConnectionFactoryThread,
+)
 from .vision.vision import VisionThread
+
 
 VISION_THREAD = None
 RIO_THREAD = None

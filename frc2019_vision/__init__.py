@@ -2,7 +2,9 @@ import os
 import queue
 import sys
 import threading
+
 from enum import Enum
+
 
 # Taken from pipenv
 # see https://github.com/pypa/pipenv/blob/master/pipenv/__init__.py

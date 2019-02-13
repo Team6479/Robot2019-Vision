@@ -1,7 +1,6 @@
 from . import assemble_message, get_events, set_events  # noqa: F401
 from .base_events import BaseGetEvent, BaseSetEvent
 
-
 GET_EVENTS: dict = {}
 SET_EVENTS: dict = {}
 
@@ -19,7 +18,10 @@ def index():
 
 def parse(data: list) -> str:
     command = data[0]
-    keyword = data[1]
+    try:
+        keyword = data[1]
+    except IndexError:
+        return assemble_message("No keyword supplied", True)
 
     if command == "GET":
         if keyword in GET_EVENTS.keys():
@@ -34,3 +36,5 @@ def parse(data: list) -> str:
                 return assemble_message("Arg not supplied for SET", True)
         else:
             return assemble_message("Invalid keyword for SET", True)
+    else:
+        return assemble_message("Invalid command: {}".format(command), True)

@@ -1,5 +1,6 @@
 import cv2
 
+from . import constants
 from .. import environment
 
 
@@ -9,11 +10,13 @@ def imshow(name: str, frame):
 
 
 def draw_crosshairs(frame):
+    half_width = int(constants.SCREEN_WIDTH / 2)
+    half_height = int(constants.SCREEN_HEIGHT / 2)
     # Draw main vertical line
-    cv2.line(frame, (400, 0), (400, 600), (0, 0, 255), 2)
+    cv2.line(frame, (half_width, 0), (half_width, constants.SCREEN_HEIGHT), (0, 0, 255), 2)  # noqa: E501
     # Draw main horizontal line
-    cv2.line(frame, (0, 300), (800, 300), (0, 0, 255), 2)
+    cv2.line(frame, (0, half_height), (constants.SCREEN_WIDTH, half_height), (0, 0, 255), 2)  # noqa: E501
 
     # Draw two guide lines
-    cv2.line(frame, (350, 100), (350, 500), (0, 0, 255), 2)
-    cv2.line(frame, (450, 100), (450, 500), (0, 0, 255), 2)
+    cv2.line(frame, (half_height + 50, 100), (half_height + 50, 500), (0, 0, 255), 2)  # noqa: E501
+    cv2.line(frame, (half_width + 50, 100), (half_width + 50, 500), (0, 0, 255), 2)  # noqa: E501

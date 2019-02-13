@@ -1,7 +1,8 @@
 import cv2
 
-from . import gui
+from . import constants, gui, pipeline
 from .. import StoppableThread, Target, environment
+
 
 def update_enviornment(distance, angle):
     # Update values in the enviorment
@@ -11,7 +12,8 @@ def update_enviornment(distance, angle):
 
 def create_windows():
     cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Frame", SCREEN_WIDTH, SCREEN_HEIGHT)
+    cv2.resizeWindow("Frame", constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT)
+
 
 class VisionThread(StoppableThread):
     def __init__(self):
@@ -41,7 +43,9 @@ class VisionThread(StoppableThread):
                 target: Target = environment.TARGET.get()
 
                 if target == Target.TAPE:
-                    tape_pipeline = pipeline.TapePipeline(calib_fname=constants.CALIBRATION_FILE_LOCATION)
+                    tape_pipeline = pipeline.TapePipeline(
+                        calib_fname=constants.CALIBRATION_FILE_LOCATION
+                    )
                     frame, dist, angle = tape_pipeline.process_image(frame)
                     update_enviornment(dist, angle)
 
