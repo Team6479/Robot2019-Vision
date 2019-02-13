@@ -8,8 +8,9 @@ TARGET.put(Target.NONE)
 
 GUI: bool = False
 CAMERA_PORT: int = 0
-VIDEO_STREAM: VideoStream = VideoStream(src=CAMERA_PORT).start()
-
+VideoStream = VideoStream(src=CAMERA_PORT).start()
+VIDEO_STREAM: VIDEO_STREAM.set(cv2.CAP_PROP_EXPOSURE,-8)
+ 
 # Vision Information
 DISTANCE_FROM_OBJECT: OverwritingLifoQueue = OverwritingLifoQueue(2)
 ANGLE_FROM_CENTER: OverwritingLifoQueue = OverwritingLifoQueue(2)
