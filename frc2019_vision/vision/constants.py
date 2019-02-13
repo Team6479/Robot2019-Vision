@@ -51,7 +51,7 @@ VISION_TAPE_ANGLE_FROM_HORIZONTAL_RAD = math.radians(VISION_TAPE_ANGLE_FROM_HORI
 """Angle between the vision tape and the horizontal axis (radians)"""
 
 # Vision tape relative geometry
-VISION_TAPE_MIN_SEPARATION_IN = 8.5
+VISION_TAPE_MIN_SEPARATION_IN = 8
 """Distance between the two pieces of vision tape at their closest point (inches)"""
 
 VISION_TAPE_MIN_SEPARATION_FT = VISION_TAPE_MIN_SEPARATION_IN / 12
