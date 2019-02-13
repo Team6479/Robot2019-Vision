@@ -10,6 +10,11 @@ CalibrationResults = collections.namedtuple("CalibrationResults",
                                             ["camera_matrix", "dist_coeffs", "rvecs", "tvecs", "fisheye"])
 CalibrationResults.__new__.__defaults__ = (False,) 
 
+lower_green = np.array([0,220,25])
+upper_green = np.array([101, 255, 255])
+
+lower_orange = np.array([0,220,25])
+upper_orange = np.array([101, 255, 255])
 
 class BallPipeline:
 
@@ -23,10 +28,7 @@ class BallPipeline:
         # construct a mask for the color "green", then perform
         # a series of dilations and erosions to remove any small
         # blobs left in the mask
-        mask = cv2.inRange(hsv, 
-                          (0,220,25), 
-                          (101, 255, 255)
-                          )
+        mask = cv2.inRange(hsv, lower_orange, upper_orange)
         # find contours in the mask and initialize the current
         # (x, y) center of the ball
         cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -100,11 +102,7 @@ class TapePipeline:
     def generate_bitmask_camera(self, image: np.array) -> np.array:
         image = cv2.blur(image,(7,7))
         hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        im = cv2.inRange(
-            hsv_image,
-            (89, 79, 163),
-            (97, 126, 255)
-        )
+        im = cv2.inRange(hsv_image, lower_green, upper_green)
         closing = cv2.morphologyEx(im, cv2.MORPH_CLOSE, np.ones((3, 3)))
         return closing
 
