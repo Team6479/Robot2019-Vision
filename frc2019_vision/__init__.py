@@ -2,9 +2,7 @@ import os
 import queue
 import sys
 import threading
-
 from enum import Enum
-
 
 # Taken from pipenv
 # see https://github.com/pypa/pipenv/blob/master/pipenv/__init__.py
@@ -40,6 +38,19 @@ class OverwritingLifoQueue(queue.LifoQueue):
         self._put(item)
 
 
+class FrameQueue(queue.LifoQueue):
+    def _get(self):
+        return self.queue[-1]
+
+    def put(self, item):
+        if self.full():
+            try:
+                del self.queue[0]
+            except Exception:
+                pass
+        self._put(item)
+
+
 class StoppableThread(threading.Thread):
     """Thread class with a stop() method. The thread itself has to check
     regularly for the stopped() condition."""
@@ -51,5 +62,5 @@ class StoppableThread(threading.Thread):
     def stop(self):
         self._stop_event.set()
 
-    def stopped(self):
+    def stopped(self) -> bool:
         return self._stop_event.is_set()
