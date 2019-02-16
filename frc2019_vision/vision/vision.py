@@ -28,8 +28,7 @@ class VisionThread(StoppableThread):
                 if self.stopped():
                     continue
                 # grab the current frame
-                frame = environment.VIDEO_STREAM.read()
-
+                ret, frame = environment.VIDEO_STREAM.read()
                 # Put current frame (with crosshairs) in queue for Driverstation stream
                 frame_copy = frame
                 gui.draw_crosshairs(frame_copy)
@@ -37,8 +36,8 @@ class VisionThread(StoppableThread):
 
                 # if we are viewing a video and we did not grab a frame,
                 # then we have reached the end of the video
-                if frame is None:
-                    break
+                if not ret:
+                    continue
 
                 target: Target = environment.TARGET.get()
 
@@ -71,7 +70,7 @@ class VisionThread(StoppableThread):
         # When we break out of the while loop aka time to stop
         # we perform appropriate actions.
         # stop the camera video stream
-        environment.VIDEO_STREAM.stop()
+        environment.VIDEO_STREAM.release()
 
         if environment.GUI:
             # close all windows

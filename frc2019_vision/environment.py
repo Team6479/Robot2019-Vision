@@ -1,4 +1,4 @@
-from imutils.video import VideoStream
+from cv2 import VideoCapture
 
 from . import FrameQueue, OverwritingLifoQueue, Target
 
@@ -9,7 +9,7 @@ TARGET.put(Target.NONE)
 
 GUI: bool = False
 CAMERA_PORT: int = 0
-VIDEO_STREAM: VideoStream = VideoStream(src=CAMERA_PORT).start()
+VIDEO_STREAM: VideoCapture = VideoCapture(CAMERA_PORT)
 
 NETIFACE: str = "eth0"
 

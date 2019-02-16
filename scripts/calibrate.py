@@ -4,9 +4,7 @@ import logging
 import cv2
 import numpy as np
 
-import constants
-import pipeline
-
+from frc2019_vision.vision import constants, pipeline
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -48,7 +46,7 @@ objp[:, :2] = np.mgrid[0 : dim[0], 0 : dim[1]].T.reshape(-1, 2)
 objpoints = []  # 3d point in real world space
 imgpoints = []  # 2d points in image plane.
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(2)
 
 logging.info("Initialized camera capture stream")
 logger.info("Press spacebar to take an image")

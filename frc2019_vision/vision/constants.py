@@ -1,4 +1,5 @@
 import math
+import os
 
 import numpy as np
 
@@ -130,5 +131,5 @@ VISION_TAPE_OBJECT_POINTS = np.array(
 CAMERA_ID = int(0)
 """The id of the camera"""
 
-CALIBRATION_FILE_LOCATION = "prod_camera_calib.pickle"
+CALIBRATION_FILE_LOCATION = "{}/prod_camera_calib.pickle".format(os.path.dirname(__file__))
 """The path to the pickle containing the calibration information"""

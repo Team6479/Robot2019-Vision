@@ -1,5 +1,6 @@
 import collections
 import math
+import os
 import pickle
 from typing import List, Optional, Tuple
 
@@ -102,34 +103,40 @@ class TapePipeline:
         Optional[float],
         Optional[np.array],
     ]:
-        image = imutils.resize(image, width=800)
+        # image = imutils.resize(image, width=800)
         bitmask = self.generate_bitmask_camera(image)
         contours = self.get_contours(bitmask)
         corners_subpixel = self.get_corners(contours, bitmask)
 
+        print(corners_subpixel)
+
+        if len(corners_subpixel) < 1:
+            return image, None, None
+
         try:
             rvec, tvec, dist = self.estimate_pose(corners_subpixel)
             euler_angles = self.rodrigues_to_euler_angles(rvec)
+            dist_meters = dist * 0.3048
+            angles_degree = math.degrees(euler_angles[0])
         except cv2.error:
             rvec, tvec, dist, euler_angles = None, None, None, None  # noqa: F841
-
+            dist_meters = None
+            angles_degree = None
         frame = cv2.drawContours(image, contours, -1, (255, 0, 0), thickness=3)
-        dist_meters = dist * 0.3048
-        angles_degree = math.degrees(euler_angles)
 
         return frame, dist_meters, angles_degree
 
     def generate_bitmask_camera(self, image: np.array) -> np.array:
-        image = cv2.blur(image, (7, 7))
+        # image = cv2.blur(image, (7, 7))
         hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         im = cv2.inRange(hsv_image, lower_green, upper_green)
         closing = cv2.morphologyEx(im, cv2.MORPH_CLOSE, np.ones((3, 3)))
+        # print(closing)
         return closing
 
     def get_contours(self, bitmask: np.array) -> List[np.array]:
-        contours, hierarchy = cv2.findContours(
-            bitmask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
-        )
+        contours = cv2.findContours(bitmask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours = imutils.grab_contours(contours)
         contour_hull_areas = [
             cv2.contourArea(cv2.convexHull(contour)) for contour in contours
         ]
@@ -183,7 +190,6 @@ class TapePipeline:
             self.calibration_info.camera_matrix,
             self.calibration_info.dist_coeffs,
         )
-
         dist = np.linalg.norm(tvec)
         return rvec, tvec, dist
 
@@ -199,6 +205,7 @@ class TapePipeline:
             x = np.math.atan2(-mat[1, 2], mat[1, 1])
             y = np.math.atan2(-mat[2, 0], sy)
             z = 0
+            print("")
         return np.array([x, y, z])
 
 
@@ -208,7 +215,7 @@ def save_calibration_results(
     rvecs: np.array,
     tvecs: np.array,
     fisheye: bool,
-    fname: str = "calibration_info.pickle",
+    fname: str = "{}/calibration_info.pickle".format(os.path.dirname(__file__)),
 ):
     results = CalibrationResults(camera_matrix, dist_coeffs, rvecs, tvecs, fisheye)
     with open(fname, "wb") as f:
