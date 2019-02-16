@@ -1,10 +1,8 @@
-import math
-
 import cv2
-import imutils
 
-from . import gui
+from . import constants, gui, pipeline
 from .. import StoppableThread, Target, environment
+
 
 def update_enviornment(distance, angle):
     # Update values in the enviorment
@@ -14,7 +12,8 @@ def update_enviornment(distance, angle):
 
 def create_windows():
     cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Frame", SCREEN_WIDTH, SCREEN_HEIGHT)
+    cv2.resizeWindow("Frame", constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT)
+
 
 class VisionThread(StoppableThread):
     def __init__(self):
@@ -29,8 +28,7 @@ class VisionThread(StoppableThread):
                 if self.stopped():
                     continue
                 # grab the current frame
-                frame = environment.VIDEO_STREAM.read()
-
+                ret, frame = environment.VIDEO_STREAM.read()
                 # Put current frame (with crosshairs) in queue for Driverstation stream
                 frame_copy = frame
                 gui.draw_crosshairs(frame_copy)
@@ -38,13 +36,19 @@ class VisionThread(StoppableThread):
 
                 # if we are viewing a video and we did not grab a frame,
                 # then we have reached the end of the video
-                if frame is None:
-                    break
+                if not ret:
+                    continue
 
                 target: Target = environment.TARGET.get()
 
                 if target == Target.TAPE:
+<<<<<<< HEAD
                     tape_pipeline = pipeline.TapePipeline(calib_fname=constants.CALIBRATION_FILE_LOCATION)
+=======
+                    tape_pipeline = pipeline.TapePipeline(
+                        calib_fname=constants.CALIBRATION_FILE_LOCATION
+                    )
+>>>>>>> 5a9c16a649f100ee173144b0053ca989de0588a8
                     frame, dist, angle = tape_pipeline.process_image(frame)
                     update_enviornment(dist, angle)
 
@@ -67,7 +71,7 @@ class VisionThread(StoppableThread):
         # When we break out of the while loop aka time to stop
         # we perform appropriate actions.
         # stop the camera video stream
-        environment.VIDEO_STREAM.stop()
+        environment.VIDEO_STREAM.release()
 
         if environment.GUI:
             # close all windows

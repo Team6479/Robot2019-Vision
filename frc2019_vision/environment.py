@@ -1,4 +1,4 @@
-from imutils.video import VideoStream
+from cv2 import VideoCapture, rotate, ROTATE_90_CLOCKWISE
 
 from . import FrameQueue, OverwritingLifoQueue, Target
 
@@ -9,7 +9,8 @@ TARGET.put(Target.NONE)
 
 GUI: bool = False
 CAMERA_PORT: int = 0
-VIDEO_STREAM: VideoStream = VideoStream(src=CAMERA_PORT).start()
+VideoCapture = VideoCapture(CAMERA_PORT)
+VIDEO_STREAM = VideoCapture = rotate(VideoCapture, rotateCode=ROTATE_90_CLOCKWISE)
 
 NETIFACE: str = "eth0"
 
