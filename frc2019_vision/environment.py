@@ -1,4 +1,4 @@
-from cv2 import VideoCapture, rotate, ROTATE_90_CLOCKWISE
+from cv2 import VideoCapture
 
 from . import FrameQueue, OverwritingLifoQueue, Target
 
@@ -9,8 +9,7 @@ TARGET.put(Target.NONE)
 
 GUI: bool = False
 CAMERA_PORT: int = 0
-VideoCapture = VideoCapture(CAMERA_PORT)
-VIDEO_STREAM = VideoCapture = rotate(VideoCapture, rotateCode=ROTATE_90_CLOCKWISE)
+VIDEO_STREAM: VideoCapture = VideoCapture(CAMERA_PORT)
 
 NETIFACE: str = "eth0"
 
@@ -20,3 +19,4 @@ DRIVERSTATION_FRAMES: FrameQueue = FrameQueue(2)
 # Vision Information
 DISTANCE_FROM_OBJECT: OverwritingLifoQueue = OverwritingLifoQueue(2)
 ANGLE_FROM_CENTER: OverwritingLifoQueue = OverwritingLifoQueue(2)
+LATERAL_OFFSET: OverwritingLifoQueue = OverwritingLifoQueue(2)

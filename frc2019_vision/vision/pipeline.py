@@ -2,6 +2,7 @@ import collections
 import math
 import os
 import pickle
+
 from typing import List, Optional, Tuple
 
 import cv2
@@ -9,6 +10,7 @@ import imutils
 import numpy as np
 
 from . import constants
+
 
 CalibrationResults = collections.namedtuple(
     "CalibrationResults", ["camera_matrix", "dist_coeffs", "rvecs", "tvecs", "fisheye"]
@@ -107,7 +109,7 @@ class TapePipeline:
         contours = self.get_contours(bitmask)
         frame = cv2.drawContours(image, contours[:1], -1, (255, 0, 0), thickness=3)
 
-        if len(contours) >= 2:
+        if len(contours) < 2:
             return frame, None, None
 
         corners_subpixel = self.get_corners(contours, bitmask)
@@ -149,7 +151,7 @@ class TapePipeline:
                     )
                     is_candidate.append(True)
                     continue
-                        
+
             is_candidate.append(False)
 
         candidates = [convex_hulls[i] for i, contour in enumerate(contours) if is_candidate[i]]
