@@ -20,7 +20,9 @@ class GetPosition(BaseGetEvent):
 
     @staticmethod
     def run() -> str:
-        string = "{0},{1}".format(
-            environment.DISTANCE_FROM_OBJECT.get(), environment.ANGLE_FROM_CENTER.get()
+        string = "{0},{1},{2}".format(
+            environment.DISTANCE_FROM_OBJECT.get(),
+            environment.ANGLE_FROM_CENTER.get(),
+            environment.LATERAL_OFFSET.get(),
         )
         return assemble_message(string)

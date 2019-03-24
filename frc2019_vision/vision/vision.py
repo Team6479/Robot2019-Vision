@@ -1,4 +1,5 @@
 import cv2
+import imutils
 
 from . import constants, gui, pipeline
 from .. import StoppableThread, Target, environment
@@ -30,15 +31,19 @@ class VisionThread(StoppableThread):
                     continue
                 # grab the current frame
                 ret, frame = environment.VIDEO_STREAM.read()
-                # Put current frame (with crosshairs) in queue for Driverstation stream
-                frame_copy = frame
-                gui.draw_crosshairs(frame_copy)
-                environment.DRIVERSTATION_FRAMES.put(frame_copy)
 
                 # if we are viewing a video and we did not grab a frame,
                 # then we have reached the end of the video
                 if not ret:
                     continue
+
+                # frame = cv2.rotate(frame, rotateCode=cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+                # Put current frame (with crosshairs) in queue for Driverstation stream
+                stream_frame = frame.copy()
+                # stream_frame = imutils.resize(stream_frame, width=constants.SCREEN_WIDTH, height=constants.SCREEN_HEIGHT)
+                # gui.draw_crosshairs(stream_frame)
+                environment.DRIVERSTATION_FRAMES.put(stream_frame)
 
                 target: Target = environment.TARGET.get()
 
