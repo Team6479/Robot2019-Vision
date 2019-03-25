@@ -17,20 +17,31 @@ CalibrationResults = collections.namedtuple(
 )
 CalibrationResults.__new__.__defaults__ = (False,)
 
-PipelineResults = collections.namedtuple("PipelineResults",
-                                         ['bitmask', 'trash', 'contours', 'corners', 'pose_estimation', 'euler_angles'])
+PipelineResults = collections.namedtuple(
+    "PipelineResults",
+    ["bitmask", "trash", "contours", "corners", "pose_estimation", "euler_angles"],
+)
 
-PoseEstimation = collections.namedtuple("PoseEstimation", ['left_rvec', 'left_tvec', 'right_rvec', 'right_tvec'])
-EulerAngles = collections.namedtuple("EulerAngles", ['left', 'right'])
+PoseEstimation = collections.namedtuple(
+    "PoseEstimation", ["left_rvec", "left_tvec", "right_rvec", "right_tvec"]
+)
+EulerAngles = collections.namedtuple("EulerAngles", ["left", "right"])
 
-PipelineResults._field_types = {'bitmask': np.array, 'contours': List[np.array], 'corners': List[np.array],
-                                'pose_estimation': PoseEstimation, 'euler_angles': EulerAngles}
+PipelineResults._field_types = {
+    "bitmask": np.array,
+    "contours": List[np.array],
+    "corners": List[np.array],
+    "pose_estimation": PoseEstimation,
+    "euler_angles": EulerAngles,
+}
+
 
 def avg(iter):
     try:
-        return sum(iter)/len(iter)
+        return sum(iter) / len(iter)
     except ZeroDivisionError:
         return 0
+
 
 lower_green = np.array([0, 220, 25])
 upper_green = np.array([101, 255, 255])
@@ -107,7 +118,8 @@ class BallPipeline:
 class TapePipeline:
     def __init__(self, calib_fname: str = None):
         self.last_centroid_x = []
-        self.width, self.height = 0
+        self.width = 0
+        self.height = 0
         if calib_fname is None:
             raise TypeError("calib_fname (argument 2) must be str, not None")
         self.calibration_info = load_calibration_results(calib_fname)
@@ -132,7 +144,9 @@ class TapePipeline:
         except (cv2.error, AttributeError):
             result, euler_angles = None, None
 
-        return PipelineResults(bitmask, trash_contours, contours, corners_subpixel, result, euler_angles)
+        return PipelineResults(
+            bitmask, trash_contours, contours, corners_subpixel, result, euler_angles
+        )
 
     def generate_bitmask_camera(self, image: np.array) -> np.array:
         image = cv2.blur(image, (7, 7))
@@ -143,7 +157,9 @@ class TapePipeline:
 
     def get_contours(self, bitmask: np.array) -> Tuple[List[np.array], List[np.array]]:
         trash = []
-        contours, hierarchy = cv2.findContours(bitmask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours, hierarchy = cv2.findContours(
+            bitmask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+        )
         convex_hulls = [cv2.convexHull(contour) for contour in contours]
         contour_hull_areas = [cv2.contourArea(hull) for hull in convex_hulls]
 
@@ -163,8 +179,12 @@ class TapePipeline:
             left_x = cnt[left_index][0]
             right_x = cnt[right_index][0]
 
-            return top_y > 10 and bot_y < height - 10 and left_x > 10 and right_index < width - 10
-
+            return (
+                top_y > 10
+                and bot_y < height - 10
+                and left_x > 10
+                and right_index < width - 10
+            )
 
         is_candidate = []
         for contour, contour_hull_area in zip(contours, contour_hull_areas):
@@ -172,7 +192,10 @@ class TapePipeline:
                 area = cv2.contourArea(contour)
                 if area / contour_hull_area > 0.85:
                     _, _, w, h = cv2.boundingRect(contour)
-                    ratio = -constants.VISION_TAPE_ROTATED_WIDTH_FT / constants.VISION_TAPE_ROTATED_HEIGHT_FT
+                    ratio = (
+                        -constants.VISION_TAPE_ROTATED_WIDTH_FT
+                        / constants.VISION_TAPE_ROTATED_HEIGHT_FT
+                    )
                     if 0.5 * ratio <= w / h <= 1.5 * ratio:
                         if not_touching_edge(contour):
                             is_candidate.append(True)
@@ -180,11 +203,13 @@ class TapePipeline:
             is_candidate.append(False)
             trash.append(contour)
 
-        candidates = [convex_hulls[i] for i, contour in enumerate(contours) if is_candidate[i]]
+        candidates = [
+            convex_hulls[i] for i, contour in enumerate(contours) if is_candidate[i]
+        ]
 
         def get_centroid_x(cnt):
             all_x = cnt.reshape((-1, 2))[:, 0]
-            return int(np.sum(all_x)/all_x.shape)
+            return int(np.sum(all_x) / all_x.shape)
             # M = cv2.moments(cnt)
             # return int(M["m10"] / M["m00"])
 
@@ -209,7 +234,7 @@ class TapePipeline:
             except Exception as e:
                 pass
 
-       if len(candidates) > 0:
+        if len(candidates) > 0:
             try:
                 if not is_tape_on_left_side(candidates[0]):
                     trash.append(candidates[0])
@@ -226,20 +251,31 @@ class TapePipeline:
         if len(candidates) > 1:
             contour_pair_centroids = {}
 
-            for i, left_cnt, right_cnt in zip(range(len(candidates)), candidates[::2], candidates[1::2]):
+            for i, left_cnt, right_cnt in zip(
+                range(len(candidates)), candidates[::2], candidates[1::2]
+            ):
                 centroid = get_centroid_x(np.concatenate((left_cnt, right_cnt)))
                 contour_pair_centroids[centroid] = i
 
             if len(contour_pair_centroids) > 0:
                 if len(self.last_centroid_x) == 0:
-                    self.last_centroid_x.append(min(contour_pair_centroids.keys(), key=lambda x: np.math.fabs(self.width/2 - x)))
+                    self.last_centroid_x.append(
+                        min(
+                            contour_pair_centroids.keys(),
+                            key=lambda x: np.math.fabs(self.width / 2 - x),
+                        )
+                    )
                     avg_X = avg(self.last_centroid_x)
                 else:
                     if len(self.last_centroid_x) > 5:
                         del self.last_centroid_x[0]
                     avg_X = avg(self.last_centroid_x)
-                    self.last_centroid_x.append(min(contour_pair_centroids.keys(),
-                                               key=lambda x: np.math.fabs(avg_X - x)))
+                    self.last_centroid_x.append(
+                        min(
+                            contour_pair_centroids.keys(),
+                            key=lambda x: np.math.fabs(avg_X - x),
+                        )
+                    )
 
                 pair_num = contour_pair_centroids[self.last_centroid_x[-1]]
 
@@ -247,7 +283,7 @@ class TapePipeline:
                 right_index = left_index + 1
 
                 trash.extend(candidates[:left_index])
-                trash.extend(candidates[right_index + 1:])
+                trash.extend(candidates[right_index + 1 :])
                 candidates = [candidates[left_index], candidates[right_index]]
                 # scandidates.sort(key=get_centroid_x)
                 print(is_tape_on_left_side(candidates[0]))
@@ -257,7 +293,9 @@ class TapePipeline:
         self.last_centroid_x = []
         return [], candidates + trash
 
-    def get_corners(self, contours: List[np.array], bitmask: np.array) -> List[np.array]:
+    def get_corners(
+        self, contours: List[np.array], bitmask: np.array
+    ) -> List[np.array]:
 
         contours = [x.reshape(-1, 2) for x in contours[:2]]
 
@@ -270,11 +308,13 @@ class TapePipeline:
                 if ind != size:
                     L.pop(ind)
                 else:
-                    raise ValueError('array not found in list.')
+                    raise ValueError("array not found in list.")
 
             blank = np.zeros(bitmask.shape).astype(np.uint8)
             cv2.drawContours(blank, [cnt], -1, (255,), thickness=cv2.FILLED)
-            dst = cv2.goodFeaturesToTrack(image=blank, maxCorners=5, qualityLevel=0.16, minDistance=15).reshape(-1, 2)
+            dst = cv2.goodFeaturesToTrack(
+                image=blank, maxCorners=5, qualityLevel=0.16, minDistance=15
+            ).reshape(-1, 2)
             if len(dst) < 5:
                 return get_corners_intpixel(cnt)
 
@@ -301,7 +341,9 @@ class TapePipeline:
             else:
                 inner_pt, outer_pt = left_point, right_point
 
-            bot_point = constants.line_intersect(inner_pt, leftover_point, outer_pt, fake_bottom_point)
+            bot_point = constants.line_intersect(
+                inner_pt, leftover_point, outer_pt, fake_bottom_point
+            )
 
             return top_point, inner_pt, outer_pt, bot_point
 
@@ -321,12 +363,20 @@ class TapePipeline:
             else:
                 return top_point, left_point, right_point, bot_point
 
-        corners = [np.array(get_corners_intpixel(cnt)).reshape((-1, 1, 2)) for cnt in contours]
+        corners = [
+            np.array(get_corners_intpixel(cnt)).reshape((-1, 1, 2)) for cnt in contours
+        ]
 
-        corners_subpixel = [cv2.cornerSubPix(bitmask,
-                                             corner.astype(np.float32),
-                                             (5, 5), (-1, -1),
-                                             constants.SUBPIXEL_CRITERIA) for corner in corners]
+        corners_subpixel = [
+            cv2.cornerSubPix(
+                bitmask,
+                corner.astype(np.float32),
+                (5, 5),
+                (-1, -1),
+                constants.SUBPIXEL_CRITERIA,
+            )
+            for corner in corners
+        ]
 
         return corners_subpixel
 
@@ -334,23 +384,39 @@ class TapePipeline:
 
         result = {"left": None, "right": None}
 
-        for name, corners, objp in zip(result.keys(), corners_subpixel, (constants.VISION_TAPE_OBJECT_POINTS_LEFT_SIDE, constants.VISION_TAPE_OBJECT_POINTS_RIGHT_SIDE)):
+        for name, corners, objp in zip(
+            result.keys(),
+            corners_subpixel,
+            (
+                constants.VISION_TAPE_OBJECT_POINTS_LEFT_SIDE,
+                constants.VISION_TAPE_OBJECT_POINTS_RIGHT_SIDE,
+            ),
+        ):
             # NOTE: If using solvePnPRansac, retvals are retval, rvec, tvec, inliers
             if self.calibration_info.fisheye:
-                undistorted_points = cv2.fisheye.undistortPoints(corners, self.calibration_info.camera_matrix,
-                                                                 self.calibration_info.dist_coeffs)[1:]
-                result[name] = cv2.solvePnP(objp,
-                                            undistorted_points,
-                                            self.calibration_info.camera_matrix,
-                                            None)
+                undistorted_points = cv2.fisheye.undistortPoints(
+                    corners,
+                    self.calibration_info.camera_matrix,
+                    self.calibration_info.dist_coeffs,
+                )[1:]
+                result[name] = cv2.solvePnP(
+                    objp, undistorted_points, self.calibration_info.camera_matrix, None
+                )
             else:
-                result[name] = cv2.solvePnP(objp,
-                                            corners,
-                                            self.calibration_info.camera_matrix,
-                                            self.calibration_info.dist_coeffs)[1:]
+                result[name] = cv2.solvePnP(
+                    objp,
+                    corners,
+                    self.calibration_info.camera_matrix,
+                    self.calibration_info.dist_coeffs,
+                )[1:]
 
         try:
-            return PoseEstimation(result['left'][0], result['left'][1], result['right'][0], result['right'][1])
+            return PoseEstimation(
+                result["left"][0],
+                result["left"][1],
+                result["right"][0],
+                result["right"][1],
+            )
         except TypeError:
             return None
 
@@ -372,6 +438,7 @@ class TapePipeline:
             z = 0
 
         return np.array([x, y, z])
+
 
 def save_calibration_results(
     camera_matrix: np.array,

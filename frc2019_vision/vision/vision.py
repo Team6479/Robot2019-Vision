@@ -48,23 +48,32 @@ class VisionThread(StoppableThread):
                 target: Target = environment.TARGET.get()
 
                 if target == Target.TAPE:
-                    tape_pipeline = pipeline.TapePipeline(calib_fname=constants.CALIBRATION_FILE_LOCATION)
+                    tape_pipeline = pipeline.TapePipeline(
+                        calib_fname=constants.CALIBRATION_FILE_LOCATION
+                    )
                     pipeline_result = tape_pipeline.process_image(frame)
                     pose_estimation = pipeline_result.pose_estimation
                     tvecs = None
                     rvecs = None
                     euler_angles = None
                     if pose_estimation is not None:
-                        tvecs =  (pose_estimation.left_tvec + pose_estimation.right_tvec) / 2
-                        rvecs = (pose_estimation.left_rvec)
-                        euler_angles = (pipeline_result.euler_angles.left + pipeline_result.euler_angles.right) / 2
+                        tvecs = (
+                            pose_estimation.left_tvec + pose_estimation.right_tvec
+                        ) / 2
+                        rvecs = pose_estimation.left_rvec
+                        euler_angles = (
+                            pipeline_result.euler_angles.left
+                            + pipeline_result.euler_angles.right
+                        ) / 2
 
-                        #tvecs[2][0] for distance from plane to plane
-                        #tvecs[0][0] for lateral distance
-                        #np.linalg.norm(tvecs) for euclidean distance
-                        #euler angle contains [x,y,z] (radians)
+                        # tvecs[2][0] for distance from plane to plane
+                        # tvecs[0][0] for lateral distance
+                        # np.linalg.norm(tvecs) for euclidean distance
+                        # euler angle contains [x,y,z] (radians)
 
-                        update_enviornment(tvecs[2][0], math.degrees(euler_angles[1]), tvecs[0][0])
+                        update_enviornment(
+                            tvecs[2][0], math.degrees(euler_angles[1]), tvecs[0][0]
+                        )
                     else:
                         update_enviornment(None, None, None)
 

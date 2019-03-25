@@ -1,4 +1,3 @@
-
 from . import assemble_message, get_events, set_events  # noqa: F401
 from .base_events import BaseGetEvent, BaseSetEvent
 
