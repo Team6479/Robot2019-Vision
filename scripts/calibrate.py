@@ -6,6 +6,7 @@ import numpy as np
 
 from frc2019_vision.vision import constants, pipeline
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "--fisheye",

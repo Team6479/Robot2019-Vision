@@ -1,6 +1,7 @@
 #! /bin/bash
 
-rsync -av -e 'sshpass -p nvidia ssh' --exclude='.git' \
+$SSH_ARGS="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+rsync -av -e "sshpass -p nvidia ssh $SSH_ARGS" --exclude='.git' \
                                      --exclude='.vscode' \
                                      --exclude '*.egg-info' \
                                      --exclude 'pip-wheel-metadata' \
@@ -10,7 +11,7 @@ rsync -av -e 'sshpass -p nvidia ssh' --exclude='.git' \
 
 # Add this to end of script: pip3.6 install --no-deps --no-build-isolation --user /home/nvidia/Robot2019-Vision/
 
-sshpass -p nvidia ssh nvidia@192.168.1.7 << EOF
+sshpass -p nvidia ssh $SSH_ARGS nvidia@192.168.1.7 << EOF
     echo 'Bootstrapping Jetson'
-    pip3.6 install --no-deps --no-build-isolation --user /home/nvidia/Robot2019-Vision/
+    pip3.6 install --user /home/nvidia/Robot2019-Vision/
 EOF
