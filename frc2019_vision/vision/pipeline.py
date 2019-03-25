@@ -157,9 +157,10 @@ class TapePipeline:
 
     def get_contours(self, bitmask: np.array) -> Tuple[List[np.array], List[np.array]]:
         trash = []
-        contours, hierarchy = cv2.findContours(
+        contours = cv2.findContours(
             bitmask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
         )
+        contours = imutils.grab_contours(contours)
         convex_hulls = [cv2.convexHull(contour) for contour in contours]
         contour_hull_areas = [cv2.contourArea(hull) for hull in convex_hulls]
 
