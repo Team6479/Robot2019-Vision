@@ -52,6 +52,7 @@ class VisionThread(StoppableThread):
                         calib_fname=constants.CALIBRATION_FILE_LOCATION
                     )
                     pipeline_result = tape_pipeline.process_image(frame)
+                    pose_estimation = None
                     try:
                         pose_estimation = pipeline_result.pose_estimation
                     except AttributeError:
