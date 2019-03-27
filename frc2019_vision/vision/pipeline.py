@@ -182,9 +182,9 @@ class TapePipeline:
 
             return (
                 top_y > 10
-                and bot_y < height - 10
+                and bot_y < self.height - 10
                 and left_x > 10
-                and right_index < width - 10
+                and right_index < self.width - 10
             )
 
         is_candidate = []
