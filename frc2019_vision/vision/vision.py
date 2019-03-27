@@ -5,7 +5,7 @@ from . import constants, gui, pipeline
 from .. import StoppableThread, Target, environment
 
 
-def update_enviornment(distance, angle):
+def update_enviornment(distance, angle, offset):
     # Update values in the enviorment
     environment.DISTANCE_FROM_OBJECT.put(distance)
     environment.ANGLE_FROM_CENTER.put(angle)
