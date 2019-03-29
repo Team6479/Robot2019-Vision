@@ -1,5 +1,6 @@
 import cv2
 import imutils
+import math
 
 from . import constants, gui, pipeline
 from .. import StoppableThread, Target, environment
